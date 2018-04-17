@@ -2,7 +2,7 @@
   <table class="Cart">
     <tr>
       <td class="Navigation">
-        <div v-for="(tab, key, index) in tabs" @click="select(key, index)" :key="index">{{index+1}} {{key}}</div>
+        <div :class="{'active-tab': key ===  currentTab}" v-for="(tab, key, index) in tabs" @click="select(key, index)" :key="index">{{index+1}} {{key}}</div>
       </td>
       <td>Ваша картина</td>
     </tr>
@@ -22,15 +22,16 @@
       <td></td>
     </tr>
     <tr>
-      <td >Price: 0 грн</td>
-      <td><button @click="next()">Custom Next Button</button></td>
+      <td class="Price"><span>Стоимость:</span> <span>{{currentPrice}} грн</span> </td>
+      <td><button class="Button" @click="next()">Далее</button></td>
     </tr>
   </table>
 </template>
 
-
 <script>
-import Flickity from "vue-flickity";
+import Flickity from "vue-flickity"
+import { mapGetters } from "vuex"
+import { mapMutations } from "vuex"
 
 export default {
   data() {
@@ -66,9 +67,24 @@ export default {
      
     
   },
+  computed: {
+    ...mapGetters([
+      'chosenImage',
+      'chosenFrame',
+      'chosenFingerprints',
+      'currentPrice'
+    ])
+  },
   methods: {
     next() {
-      this.$refs.flickity.next();
+      let tabs = []
+      for (const key in this.tabs) {
+        tabs.push(key)
+      }
+      if (tabs.indexOf(this.currentTab) < tabs.length - 1) {
+        this.currentTab = tabs[tabs.indexOf(this.currentTab) + 1]
+        this.$refs.flickity.next()
+      }
     },
     select(key, index) {
       this.currentTab = key
@@ -111,7 +127,11 @@ export default {
       border-left: 1px solid rgb(126, 113, 101);
     }
   }
+  .active-tab {
+  font-weight: bolder;
+  }
 }
+
 
 .Carousel {
   width: 640px;
@@ -124,6 +144,34 @@ export default {
   height: 100%; 
 
 }
+
+.Price {
+  text-align: right;
+  span:first-child {
+    font-weight: bolder;
+  }
+  span:last-child {
+    font-weight: bold;
+    font-size: 30px;
+    color: #8dbc55;
+  }
+
+}
+
+.Button {
+  background:  #8dbc55;
+  height: 50px;
+  width: 250px;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 18px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+
+
 </style>
 
 
