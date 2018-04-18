@@ -25,6 +25,15 @@ export const store = new Vuex.Store({
     },
   },
   mutations: {
-    
+    setImage (state, payload) {
+      state.image = payload
+    },
+    setFrame (state, payload) {
+      state.frame = payload
+    },
+    setFingerprints (state, payload) {
+      state.fingerprints = payload
+    },
+
   }
 })
