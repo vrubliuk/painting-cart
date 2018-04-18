@@ -2,7 +2,7 @@
   <table class="Cart">
     <tr>
       <td class="Navigation">
-        <div :class="{'active-tab': key ===  currentTab}" v-for="(tab, key, index) in tabs" @click="select(key, index)" :key="index">{{index+1}} {{key}}</div>
+        <div :class="{'active-tab': key ===  currentTab}" v-for="(tab, key, index) in tabs" @click="select(key, index)" :key="index">{{index+1}} {{tab.name}}</div>
       </td>
       <td class="Title">Ваша картина</td>
     </tr>
@@ -14,7 +14,7 @@
             <p>{{tab.text}}</p>
             <p v-if="tab.additionalText">{{tab.additionalText}}</p>
             <div class="Pictures-container">
-              <img v-for="picture in pictures" :src="(picture)" :key="picture">
+              <img v-for="picture in tab.images" :src="(picture)" :key="picture" @click="selectImage()">
             </div>
           </div>
         </flickity>
@@ -36,7 +36,10 @@
 </template>
 
 <script>
-import { pictures } from './pictures'
+import { pictures } from "./pictures"
+import { frames } from "./frames"
+import { fingerprints } from "./fingerprints"
+
 import Flickity from "vue-flickity"
 import { mapGetters } from "vuex"
 import { mapMutations } from "vuex"
@@ -44,30 +47,37 @@ import { mapMutations } from "vuex"
 export default {
   data() {
     return {
-      pictures,
-      currentTab: "Изображение",
+      currentTab: "picture",
       tabs: {
-        Изображение: {
+        picture: {
+          name: "Изображение",
           title: "Выберите изображение",
           text:
-            "Для начала выберите основу, саму картину, на которую вы и гости вашего праздника будете наносить отпечатки пальцев с пожеланиями"
+            "Для начала выберите основу, саму картину, на которую вы и гости вашего праздника будете наносить отпечатки пальцев с пожеланиями",
+          images: pictures
         },
-        Рама: {
+        frame: {
+          name: "Рама",
           title: "Рама",
           text:
-            'Подберите раму, которая подойдет случаю и впишется в интерьер, ведь вы же не просто оставляете "пальчики", а создаете предмет декора для дома и офиса:'
+            'Подберите раму, которая подойдет случаю и впишется в интерьер, ведь вы же не просто оставляете "пальчики", а создаете предмет декора для дома и офиса:',
+          images: frames
         },
-        Заголовок: {
+        title: {
+          name: "Заголовок",
           title: "Заголовок",
           text:
-            'персонализируйте ваше "Дерево пожеланий"; вверху и внизу картины есть специальные поля, которые можно заполнить по вашему усмотрению: вписать имена виновников торжества, или особые пожелания, добавить дату, или логотип компании, если речь идет о корпоративном подарке.'
+            'персонализируйте ваше "Дерево пожеланий"; вверху и внизу картины есть специальные поля, которые можно заполнить по вашему усмотрению: вписать имена виновников торжества, или особые пожелания, добавить дату, или логотип компании, если речь идет о корпоративном подарке.',
+          images: null
         },
-        "Цвет отпечатков": {
+        fingerprints: {
+          name: "Цвет отпечатков",
           title: "Цвет отпечатков",
           text:
             "наконец, подберите самые подходящие цвета красок, с помощью которых вы и оставите на картине свой след на память!",
           additionalText:
-            "Обратите внимание: более 2-х цветов увеличат стоимость"
+            "Обратите внимание: более 2-х цветов увеличат стоимость",
+          images: fingerprints
         }
       },
       flickityOptions: {
@@ -87,6 +97,7 @@ export default {
     ])
   },
   methods: {
+    ...mapMutations(["setImage", "setFrame", "setFingerprints"]),
     next() {
       let tabs = [];
       for (const key in this.tabs) {
@@ -154,28 +165,31 @@ export default {
   height: 450px;
   position: relative;
   .carousel-cell {
-    padding: 20px;
+    padding: 0 20px;
     width: 100%;
     height: 100%;
     overflow-y: hidden;
   }
   .Pictures-container {
-    
-    img{
-    height: 200px;
-    border-radius: 5px;
-    border: 1px solid rgba(126, 113, 101, 0.2);
+    img {
+      display: block;
+      float: left;
+      margin: 10px;
+      width: 180px;
+      border-radius: 5px;
+      border: 1px solid rgba(126, 113, 101, 0.2);
+      &:hover {
+        box-shadow: 0 0 4px rgba(126,113,101,0.2);
+        cursor: pointer;
+        outline: 4px solid #8dbc55;
+      
+      }
 
-    &:hover {
-      box-shadow: 0 0 2px 2px rgba(126,113,101,0.2);
+      .image-active {
+        box-shadow: 0 0 4px #8dbc55;
+      }
     }
   }
-
-
-  }
-
-  
-
 }
 
 .Price {
