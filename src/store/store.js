@@ -8,7 +8,7 @@ export const store = new Vuex.Store({
     image: 'не выбрано',
     frame: 'не выбрано',
     fingerprints: 'не выбраны',
-    price: 0
+    price: 750
   },
   getters: {
     chosenImage (state) {
