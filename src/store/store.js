@@ -8,7 +8,11 @@ export const store = new Vuex.Store({
     picture: undefined,
     frame: undefined,
     fingerprints: [],
-    price: 0
+    price: 0,
+    title: '',
+    signature: '',
+    date: '',
+    font: 'Ariston'
   },
   getters: {
     chosenPicture (state) {
@@ -23,6 +27,18 @@ export const store = new Vuex.Store({
     currentPrice (state) {
       return state.price
     },
+    currentTitle (state) {
+      return state.title
+    },
+    currentSignature (state) {
+      return state.signature
+    },
+    currentDate (state) {
+      return state.date
+    },
+    currentFont (state) {
+      return state.font
+    }
   },
   mutations: {
     setPicture (state, payload) {
@@ -41,5 +57,19 @@ export const store = new Vuex.Store({
       }
       state.fingerprints = fingerprints
     },
+    setTitle (state, payload) {
+      state.title = payload
+    },
+    setSignature (state, payload) {
+      state.signature = payload
+    },
+    setDate (state, payload) {
+      state.date = payload
+    },
+    setFont (state, payload) {
+      state.font = payload
+    },
+
+
   }
 })

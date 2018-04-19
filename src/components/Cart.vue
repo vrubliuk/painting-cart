@@ -22,6 +22,17 @@
               }" v-for="(image, imageIndex) in tab.images" 
               :src="image" :key="image" @click="selectImage(key, imageIndex)">
             </div>
+            <div class="Inputs" v-if="key === 'title'">
+              <input class="Input" v-model="imageTitle" type="text" placeholder="Наша Свадьба" maxlength="25" ><span>Заголовок картины</span>
+              <br>
+              <input class="Input" v-model="imageSignature" type="text" placeholder="Анастасия и Константин" maxlength="25"><span>Подпись</span>
+               <br>
+              <input class="Input" v-model="imageDate" type="text" placeholder="29 июля 2015" maxlength="25"><span>Дата события</span>
+              <h5>Шрифт</h5>
+              <button class="FontButton" :class="{'FontButton-active': font === currentFont }" v-for="font in fonts" :key="font" @click="selectFont(font)">{{font}}</button>
+            </div>
+
+
           </div>
 
           </div>
@@ -29,15 +40,18 @@
       </td>
       <td class="Result">
         <div class="Result-details">
-          <p>Изображение: <span>{{chosenPicture !== undefined ? `Картинка №${chosenPicture}` : 'не выбрано'}}</span></p>
-          <p>Рама: <span>{{chosenFrame !== undefined ? `Багетная №${chosenFrame}` : 'не выбрано'}}</span></p>
+          <p>Изображение: <span>{{chosenPicture !== undefined ? `Картинка №${chosenPicture}` : 'Не выбрано'}}</span></p>
+          <p>Рама: <span>{{chosenFrame !== undefined ? `Багетная №${chosenFrame}` : 'Не выбрано'}}</span></p>
           <p>Отпечатки: 
-            <span v-if="!chosenFingerprints.length" >не выбрано</span> 
+            <span v-if="!chosenFingerprints.length" >Не выбрано</span> 
             <span v-else><div class="Color-container" :style="{background: color}" v-for="color in chosenFingerprints" :key="color"></div></span>
           </p>
         </div>
 
-        <div class="Result-image"></div>
+        <div class="Result-image">
+          <img src="" alt="">
+
+        </div>
       
       </td>
     </tr>
@@ -93,6 +107,11 @@ export default {
           images: fingerprints
         }
       },
+
+      
+      
+      fonts: ["Ariston", "DaVinci", "Brody"],
+      activeFont: "Ariston",
       flickityOptions: {
         initialIndex: 0,
         prevNextButtons: false,
@@ -106,11 +125,48 @@ export default {
       "chosenPicture",
       "chosenFrame",
       "chosenFingerprints",
-      "currentPrice"
-    ])
+      "currentPrice",
+      "currentTitle",
+      "currentSignature",
+      "currentDate",
+      "currentFont"
+    ]),
+    imageTitle: {
+      get() {
+        return this.currentTitle
+      },
+      set(value) {
+        this.setTitle(value)
+      }
+    },
+    imageSignature: {
+      get() {
+        return this.currentSignature
+      },
+      set(value) {
+        this.setSignature(value)
+      }
+    },
+    imageDate: {
+      get() {
+        return this.currentDate
+      },
+      set(value) {
+        this.setDate(value)
+      }
+    },
+
   },
   methods: {
-    ...mapMutations(["setPicture", "setFrame", "setFingerprints"]),
+    ...mapMutations([
+      "setPicture",
+      "setFrame",
+      "setFingerprints",
+      "setTitle",
+      "setSignature",
+      "setDate",
+      "setFont"
+    ]),
     next() {
       let tabs = [];
       for (const key in this.tabs) {
@@ -133,6 +189,9 @@ export default {
       } else if (tab === "fingerprints") {
         this.setFingerprints(imageIndex);
       }
+    },
+    selectFont(font) {
+      this.setFont(font)
     }
   },
 
@@ -192,34 +251,80 @@ export default {
       overflow-y: scroll;
       padding-right: 17px;
       box-sizing: content-box;
-    }
-    h4,
-    p {
-      margin: 10px 20px;
-    }
-    .Images {
-      overflow: auto;
-      padding: 0 10px 10px 10px;
-      .Image {
-        padding: 15px;
-        display: block;
-        float: left;
-        margin: 10px;
-        width: 180px;
-        border-radius: 8px;
-        // border: 1px solid rgba(126, 113, 101, 0.2);
-        box-shadow: 0 0 0 1px rgba(126, 113, 101, 0.2);
-        &:hover {
-          cursor: pointer;
-          box-shadow: 0 0 8px 1px rgba(126, 113, 101, 0.2);
+      h4 {
+        margin: 15px 20px 5px;
+      }
+      p {
+        margin: 5px 20px;
+        &:nth-child(3) {
+          font-weight: bold;
         }
       }
-      .Image-active {
-        border: none;
-        box-shadow: 0 0 0 4px #8dbc55;
-        &:hover {
-          cursor: pointer;
+      .Images {
+        overflow: auto;
+        padding: 0 10px 10px 10px;
+        .Image {
+          padding: 15px;
+          display: block;
+          float: left;
+          margin: 10px;
+          width: 180px;
+          border-radius: 8px;
+          // border: 1px solid rgba(126, 113, 101, 0.2);
+          box-shadow: 0 0 0 1px rgba(126, 113, 101, 0.2);
+          &:hover {
+            cursor: pointer;
+            box-shadow: 0 0 8px 1px rgba(126, 113, 101, 0.2);
+          }
+        }
+        .Image-active {
+          border: none;
           box-shadow: 0 0 0 4px #8dbc55;
+          &:hover {
+            cursor: pointer;
+            box-shadow: 0 0 0 4px #8dbc55;
+          }
+        }
+      }
+      .Inputs {
+        padding: 0px 20px;
+        span {
+          font-weight: bold;
+        }
+        .Input {
+          border: 1px solid rgba(126, 113, 101, 0.2);
+          font-weight: bold;
+          font-size: 14px;
+          color: rgb(126, 113, 101);
+          height: 40px;
+          width: 200px;
+          border-radius: 15px;
+          padding-left: 15px;
+          margin: 0px 15px 15px 0;
+          
+        }
+        ::placeholder {
+          color: rgba(126, 113, 101, 0.5);
+        }
+        h5 {
+          font-size: 14px;
+          margin: 5px 0;
+        }
+        .FontButton {
+          height: 40px;
+          width: 80px;
+          background: white;
+          color: #8dbc55;
+          border: 1px solid #8dbc55;
+          border-radius: 15px;
+          cursor: pointer;
+          font-weight: bold;
+          margin: 5px 10px 0 0;
+        }
+        .FontButton-active {
+          background: #8dbc55;
+          color: white;
+          border: 1px solid #8dbc55;
         }
       }
     }
