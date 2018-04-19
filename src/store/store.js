@@ -5,14 +5,14 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    image: 'не выбрано',
-    frame: 'не выбрано',
-    fingerprints: 'не выбраны',
-    price: 750
+    picture: undefined,
+    frame: undefined,
+    fingerprints: [],
+    price: 0
   },
   getters: {
-    chosenImage (state) {
-      return state.image
+    chosenPicture (state) {
+      return state.picture
     },
     chosenFrame (state) {
       return state.frame
@@ -25,15 +25,21 @@ export const store = new Vuex.Store({
     },
   },
   mutations: {
-    setImage (state, payload) {
-      state.image = payload
+    setPicture (state, payload) {
+      state.picture !== payload ? state.picture = payload : state.picture = undefined
     },
     setFrame (state, payload) {
-      state.frame = payload
+      state.frame !== payload ? state.frame = payload : state.frame = undefined
     },
     setFingerprints (state, payload) {
-      state.fingerprints = payload
+      let fingerprints = [...state.fingerprints]
+      let index = fingerprints.indexOf(payload)
+      if (index === -1) {
+        fingerprints.push(payload)
+      } else {
+        fingerprints.splice(index, 1)
+      }
+      state.fingerprints = fingerprints
     },
-
   }
 })
