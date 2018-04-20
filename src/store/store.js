@@ -57,6 +57,10 @@ export const store = new Vuex.Store({
       }
       state.fingerprints = fingerprints
     },
+
+    setPrice (state, payload) {
+      state.price = payload
+    },
     setTitle (state, payload) {
       state.title = payload
     },

@@ -18,8 +18,10 @@
               <img class="Image" 
               :class="{'Image-active': (key === 'picture' && chosenPicture === (imageIndex + 1)) 
               || (key === 'frame' && chosenFrame === (imageIndex + 1)) 
-              || (key === 'fingerprints' && chosenFingerprints.indexOf(imageIndex) > -1) 
-              }" v-for="(image, imageIndex) in tab.images" 
+              || (key === 'fingerprints' && chosenFingerprints.indexOf(imageIndex) > -1),
+              'Image-narrow': key === 'fingerprints'
+              }" 
+              v-for="(image, imageIndex) in tab.images" 
               :src="image" :key="image" @click="selectImage(key, imageIndex)">
             </div>
             <div class="Inputs" v-if="key === 'title'">
@@ -31,7 +33,6 @@
               <h5>Шрифт</h5>
               <button class="FontButton" :class="{'FontButton-active': font === currentFont }" v-for="font in fonts" :key="font" @click="selectFont(font)">{{font}}</button>
             </div>
-
 
           </div>
 
@@ -47,17 +48,18 @@
             <span v-else><div class="Color-container" :style="{background: color}" v-for="color in chosenFingerprints" :key="color"></div></span>
           </p>
         </div>
-
         <div class="Result-image">
-          <img src="" alt="">
-
+          <img class="Result-picture" :src="(tabs.picture.images[chosenPicture - 1])" alt="">
+          <img class="Result-frame" :src="(tabs.frame.images[chosenFrame - 1])" alt="">
+          <div class="Result-title" :style="{'font-family': currentFont}">{{currentTitle}}</div>
+          <div class="Result-signature" :style="{'font-family': currentFont}">{{currentSignature}}</div>
+          <div class="Result-date" :style="{'font-family': currentFont}">{{currentDate}}</div>
         </div>
-      
       </td>
     </tr>
     <tr>
-      <td class="Price"><span>Стоимость:</span><span> {{currentPrice}} </span> <span>грн</span> </td>
-      <td class="Button-container"><button @click="next()">Далее</button></td>
+      <td class="Price" @click="sendPaintingProps()"><span>Стоимость:</span><span> {{currentPrice}} </span><span>грн</span></td>
+      <td class="Button-container"><button @click="next()">{{currentTab !== 'fingerprints' ? 'Далее' : 'В корзину'}}</button></td>
     </tr>
   </table>
 </template>
@@ -66,7 +68,7 @@
 import { pictures } from "./pictures";
 import { frames } from "./frames";
 import { fingerprints } from "./fingerprints";
-
+import { pricelist } from "./pricelist";
 import Flickity from "vue-flickity";
 import { mapGetters } from "vuex";
 import { mapMutations } from "vuex";
@@ -108,8 +110,6 @@ export default {
         }
       },
 
-      
-      
       fonts: ["Ariston", "DaVinci", "Brody"],
       activeFont: "Ariston",
       flickityOptions: {
@@ -133,29 +133,48 @@ export default {
     ]),
     imageTitle: {
       get() {
-        return this.currentTitle
+        return this.currentTitle;
       },
       set(value) {
-        this.setTitle(value)
+        this.setTitle(value);
       }
     },
     imageSignature: {
       get() {
-        return this.currentSignature
+        return this.currentSignature;
       },
       set(value) {
-        this.setSignature(value)
+        this.setSignature(value);
       }
     },
     imageDate: {
       get() {
-        return this.currentDate
+        return this.currentDate;
       },
       set(value) {
-        this.setDate(value)
+        this.setDate(value);
       }
+    }
+  },
+  watch: {
+    chosenPicture() {
+      this.reprice();
     },
-
+    chosenFrame() {
+      this.reprice();
+    },
+    chosenFingerprints() {
+      this.reprice();
+    },
+    currentTitle() {
+      this.reprice();
+    },
+    currentSignature() {
+      this.reprice();
+    },
+    currentDate() {
+      this.reprice();
+    }
   },
   methods: {
     ...mapMutations([
@@ -165,7 +184,8 @@ export default {
       "setTitle",
       "setSignature",
       "setDate",
-      "setFont"
+      "setFont",
+      "setPrice"
     ]),
     next() {
       let tabs = [];
@@ -191,10 +211,38 @@ export default {
       }
     },
     selectFont(font) {
-      this.setFont(font)
+      this.setFont(font);
+    },
+    reprice() {
+      let price = 0;
+      this.chosenPicture !== undefined && (price += pricelist.picture);
+      this.chosenFrame !== undefined && (price += pricelist.frame);
+      this.currentTitle !== "" && (price += pricelist.title);
+      this.currentSignature !== "" && (price += pricelist.signature);
+      this.currentDate !== "" && (price += pricelist.date);
+      this.chosenFingerprints.length > 2 &&
+        (price +=
+          pricelist.fingerprints * (this.chosenFingerprints.length - 2));
+      this.setPrice(price);
+    },
+    sendPaintingProps() {
+      let paintingProps = {
+        picture: this.chosenPicture,
+        frame: this.chosenFrame,
+        fingerprints: this.chosenFingerprints,
+        title: this.currentTitle,
+        signature: this.currentSignature,
+        date: this.currentDate,
+        font: this.currentFont
+      }
+
+      console.log(paintingProps)
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://redentu.com/", true);
+      xhr.setRequestHeader("Content-type", "application/json");
+      xhr.send(JSON.stringify(paintingProps));
     }
   },
-
   components: {
     Flickity
   }
@@ -270,7 +318,6 @@ export default {
           margin: 10px;
           width: 180px;
           border-radius: 8px;
-          // border: 1px solid rgba(126, 113, 101, 0.2);
           box-shadow: 0 0 0 1px rgba(126, 113, 101, 0.2);
           &:hover {
             cursor: pointer;
@@ -284,6 +331,9 @@ export default {
             cursor: pointer;
             box-shadow: 0 0 0 4px #8dbc55;
           }
+        }
+        .Image-narrow {
+          width: 130px;
         }
       }
       .Inputs {
@@ -299,9 +349,8 @@ export default {
           height: 40px;
           width: 200px;
           border-radius: 15px;
-          padding-left: 15px;
+          padding: 0 15px;
           margin: 0px 15px 15px 0;
-          
         }
         ::placeholder {
           color: rgba(126, 113, 101, 0.5);
@@ -362,12 +411,12 @@ export default {
 }
 
 .Result {
-  // padding: 10px 20px;
+  max-width: 296px;
   vertical-align: top;
   background: #e6e3e1;
   .Result-details {
     padding: 10px 20px;
-    // padding: 20px;
+
     p {
       margin: 0;
       padding: 5px 0;
@@ -391,7 +440,32 @@ export default {
     height: 300px;
     width: 240px;
     background-color: white;
-    border: 1px solid rgba(126, 113, 101, 0.2);
+    box-shadow: 0 0 0 1px rgba(126, 113, 101, 0.2);
+    .Result-picture,
+    .Result-frame {
+      position: absolute;
+      height: 300px;
+      width: 240px;
+    }
+    .Result-title,
+    .Result-signature,
+    .Result-date {
+      position: absolute;
+      font-size: 16px;
+      text-align: center;
+      left: 0;
+      right: 0;
+    }
+
+    .Result-title {
+      top: 40px;
+    }
+    .Result-signature {
+      bottom: 50px;
+    }
+    .Result-date {
+      bottom: 30px;
+    }
   }
 }
 
@@ -412,5 +486,3 @@ export default {
   }
 }
 </style>
-
-

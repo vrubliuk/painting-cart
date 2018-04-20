@@ -9,12 +9,12 @@ import Tangelo from '../assets/images/fingerprints/Tangelo.jpg'
 
 
 export const fingerprints = {
-  'blue': BahamaBlue,
-  'lightgreen': BambooLeaves,
-  'green': CottageIvy,
-  'pink': LilacPosies,
-  'yellow': PearTart,
-  'brown': PottersClay,
-  'red': RhubarbStalk,
-  'orange': Tangelo
+  '#1E4FD4': BahamaBlue,
+  '#80984E': BambooLeaves,
+  '#016322': CottageIvy,
+  '#A7448F': LilacPosies,
+  '#E1D942': PearTart,
+  '#CF8442': PottersClay,
+  '#AB204A': RhubarbStalk,
+  '#E7772F': Tangelo
 }
