@@ -15,39 +15,39 @@ export const store = new Vuex.Store({
     font: 'Ariston'
   },
   getters: {
-    chosenPicture (state) {
+    chosenPicture(state) {
       return state.picture
     },
-    chosenFrame (state) {
+    chosenFrame(state) {
       return state.frame
     },
-    chosenFingerprints (state) {
+    chosenFingerprints(state) {
       return state.fingerprints
     },
-    currentPrice (state) {
+    currentPrice(state) {
       return state.price
     },
-    currentTitle (state) {
+    currentTitle(state) {
       return state.title
     },
-    currentSignature (state) {
+    currentSignature(state) {
       return state.signature
     },
-    currentDate (state) {
+    currentDate(state) {
       return state.date
     },
-    currentFont (state) {
+    currentFont(state) {
       return state.font
     }
   },
   mutations: {
-    setPicture (state, payload) {
+    setPicture(state, payload) {
       state.picture !== payload ? state.picture = payload : state.picture = undefined
     },
-    setFrame (state, payload) {
+    setFrame(state, payload) {
       state.frame !== payload ? state.frame = payload : state.frame = undefined
     },
-    setFingerprints (state, payload) {
+    setFingerprints(state, payload) {
       let fingerprints = [...state.fingerprints]
       let index = fingerprints.indexOf(payload)
       if (index === -1) {
@@ -57,23 +57,20 @@ export const store = new Vuex.Store({
       }
       state.fingerprints = fingerprints
     },
-
-    setPrice (state, payload) {
+    setPrice(state, payload) {
       state.price = payload
     },
-    setTitle (state, payload) {
+    setTitle(state, payload) {
       state.title = payload
     },
-    setSignature (state, payload) {
+    setSignature(state, payload) {
       state.signature = payload
     },
-    setDate (state, payload) {
+    setDate(state, payload) {
       state.date = payload
     },
-    setFont (state, payload) {
+    setFont(state, payload) {
       state.font = payload
-    },
-
-
+    }
   }
 })

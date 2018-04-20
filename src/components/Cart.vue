@@ -2,7 +2,7 @@
   <table class="Cart">
     <tr>
       <td class="Navigation">
-        <div :class="{'active-tab': key ===  currentTab}" v-for="(tab, key, index) in tabs" @click="selectTab(key, index)" :key="index">{{index+1}} {{tab.name}}</div>
+        <div :class="{'active-tab': key === currentTab}" v-for="(tab, key, index) in tabs" @click="selectTab(key, index)" :key="index">{{index+1}} {{tab.name}}</div>
       </td>
       <td class="Title">Ваша картина</td>
     </tr>
@@ -11,31 +11,29 @@
         <flickity class="Carousel" ref="flickity" :options="flickityOptions">
           <div class="carousel-cell" v-for="(tab, key) in tabs" :key="key" >
             <div class="carousel-cell-inner">
-            <h4>{{tab.textTitle}}</h4>
-            <p>{{tab.text}}</p>
-            <p v-if="tab.additionalText">{{tab.additionalText}}</p>
-            <div class="Images">
-              <img class="Image" 
-              :class="{'Image-active': (key === 'picture' && chosenPicture === (imageIndex + 1)) 
-              || (key === 'frame' && chosenFrame === (imageIndex + 1)) 
-              || (key === 'fingerprints' && chosenFingerprints.indexOf(imageIndex) > -1),
-              'Image-narrow': key === 'fingerprints'
-              }" 
-              v-for="(image, imageIndex) in tab.images" 
-              :src="image" :key="image" @click="selectImage(key, imageIndex)">
+              <h4>{{tab.textTitle}}</h4>
+              <p>{{tab.text}}</p>
+              <p v-if="tab.additionalText">{{tab.additionalText}}</p>
+              <div class="Images">
+                <img class="Image" 
+                :class="{'Image-active': (key === 'picture' && chosenPicture === (imageIndex + 1)) 
+                || (key === 'frame' && chosenFrame === (imageIndex + 1)) 
+                || (key === 'fingerprints' && chosenFingerprints.indexOf(imageIndex) > -1),
+                'Image-narrow': key === 'fingerprints'
+                }" 
+                v-for="(image, imageIndex) in tab.images" 
+                :src="image" :key="image" @click="selectImage(key, imageIndex)">
+              </div>
+              <div class="Inputs" v-if="key === 'title'">
+                <input class="Input" v-model="imageTitle" type="text" placeholder="Наша Свадьба" maxlength="25" ><span>Заголовок картины</span>
+                <br>
+                <input class="Input" v-model="imageSignature" type="text" placeholder="Анастасия и Константин" maxlength="25"><span>Подпись</span>
+                <br>
+                <input class="Input" v-model="imageDate" type="text" placeholder="29 июля 2015" maxlength="25"><span>Дата события</span>
+                <h5>Шрифт</h5>
+                <button class="FontButton" :class="{'FontButton-active': font === currentFont }" v-for="font in fonts" :key="font" @click="selectFont(font)">{{font}}</button>
+              </div>
             </div>
-            <div class="Inputs" v-if="key === 'title'">
-              <input class="Input" v-model="imageTitle" type="text" placeholder="Наша Свадьба" maxlength="25" ><span>Заголовок картины</span>
-              <br>
-              <input class="Input" v-model="imageSignature" type="text" placeholder="Анастасия и Константин" maxlength="25"><span>Подпись</span>
-               <br>
-              <input class="Input" v-model="imageDate" type="text" placeholder="29 июля 2015" maxlength="25"><span>Дата события</span>
-              <h5>Шрифт</h5>
-              <button class="FontButton" :class="{'FontButton-active': font === currentFont }" v-for="font in fonts" :key="font" @click="selectFont(font)">{{font}}</button>
-            </div>
-
-          </div>
-
           </div>
         </flickity>
       </td>
@@ -58,8 +56,15 @@
       </td>
     </tr>
     <tr>
-      <td class="Price" @click="sendPaintingProps()"><span>Стоимость:</span><span> {{currentPrice}} </span><span>грн</span></td>
-      <td class="Button-container"><button @click="next()">{{currentTab !== 'fingerprints' ? 'Далее' : 'В корзину'}}</button></td>
+      <td class="Price" @click="sendPaintingProps()">
+        <span>Стоимость:</span><span> {{currentPrice}} </span><span>грн</span>
+        </td>
+      <td class="Button-container">
+        <div class="Warning-container">
+          <button @click="proceed()">{{currentTab !== 'fingerprints' ? 'Далее' : 'В корзину'}}</button>
+          <span v-if="showWarning" class="Warning-message">{{warningText}}</span>
+        </div>
+        </td>
     </tr>
   </table>
 </template>
@@ -112,6 +117,9 @@ export default {
 
       fonts: ["Ariston", "DaVinci", "Brody"],
       activeFont: "Ariston",
+      showWarning: false,
+      warningText: "",
+
       flickityOptions: {
         initialIndex: 0,
         prevNextButtons: false,
@@ -187,7 +195,7 @@ export default {
       "setFont",
       "setPrice"
     ]),
-    next() {
+    nextTab() {
       let tabs = [];
       for (const key in this.tabs) {
         tabs.push(key);
@@ -225,6 +233,25 @@ export default {
           pricelist.fingerprints * (this.chosenFingerprints.length - 2));
       this.setPrice(price);
     },
+    validate() {
+      if (!this.chosenPicture) {
+        this.warningText = "Пожалуйста выберите изображение";
+        this.showWarning = true;
+        setTimeout(() => {
+          this.showWarning = false;
+        }, 1500);
+        this.selectTab('picture', 0)
+      } else if (!this.chosenFrame) {
+        this.warningText = "Пожалуйста выберите раму";
+        this.showWarning = true;
+        setTimeout(() => {
+          this.showWarning = false;
+        }, 1500);
+         this.selectTab('frame', 1)
+      } else {
+        return true;
+      }
+    },
     sendPaintingProps() {
       let paintingProps = {
         picture: this.chosenPicture,
@@ -234,13 +261,22 @@ export default {
         signature: this.currentSignature,
         date: this.currentDate,
         font: this.currentFont
-      }
+      };
 
-      console.log(paintingProps)
+      alert("Отправляю запрос на сервер");
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "https://redentu.com/", true);
       xhr.setRequestHeader("Content-type", "application/json");
       xhr.send(JSON.stringify(paintingProps));
+    },
+    proceed() {
+      if (this.currentTab !== "fingerprints") {
+        this.nextTab();
+      } else {
+        if (this.validate()) {
+          this.sendPaintingProps();
+        }
+      }
     }
   },
   components: {
@@ -473,6 +509,34 @@ export default {
   border-bottom-right-radius: 8px;
   text-align: center;
   background: #e6e3e1;
+  .Warning-container {
+    position: relative;
+    display: inline-block;
+  }
+  .Warning-message {
+    width: 200px;
+    background-color: rgb(126, 113, 101);
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 110%;
+    left: 50%;
+    margin-left: -100px;
+    font-size: 14px;
+  }
+  .Warning-message::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgb(126, 113, 101) transparent transparent transparent;
+  }
+
   button {
     background: #8dbc55;
     height: 50px;

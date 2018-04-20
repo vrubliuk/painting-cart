@@ -7,7 +7,6 @@ import PottersClay from '../assets/images/fingerprints/PottersClay.jpg'
 import RhubarbStalk from '../assets/images/fingerprints/RhubarbStalk.jpg'
 import Tangelo from '../assets/images/fingerprints/Tangelo.jpg'
 
-
 export const fingerprints = {
   '#1E4FD4': BahamaBlue,
   '#80984E': BambooLeaves,
