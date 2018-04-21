@@ -1,7 +1,6 @@
 # Painting-cart
 
-> Vue.js, Vuex project
-> Available here: https://vrubliuk.github.io/painting-cart/
+> Vue.js, Vuex project. Available here: https://vrubliuk.github.io/painting-cart/
 
 
 ## How to run
